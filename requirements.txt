@@ -1,4 +1,5 @@
 chromadb
 pypdf
 streamlit
-ollama
+groq
+python-dotenv

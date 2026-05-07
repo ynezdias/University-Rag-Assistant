@@ -1,5 +1,9 @@
 import chromadb
-import ollama
+import os
+from dotenv import load_dotenv
+from groq import Groq
+
+load_dotenv()
 
 
 CHROMA_DIR = "chroma_db"
