@@ -1,36 +1,433 @@
 import streamlit as st
-
 from src.rag import ask_university_bot
 
-
-st.set_page_config(page_title="University RAG Assistant")
-
-st.title("🎓 University RAG Assistant")
-
-question = st.text_input(
-    "Ask a university-related question:"
+st.set_page_config(
+    page_title="Stevens RAG Assistant",
+    page_icon="🎓",
+    layout="wide",
 )
 
-if st.button("Ask"):
-    with st.spinner("Searching documents..."):
+# ── Custom CSS ─────────────────────────────────────────────────────────────────
+st.markdown("""
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap');
 
-        answer, chunks = ask_university_bot(question)
+/* ── Reset & base ── */
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif;
+}
 
-    st.subheader("Answer")
+.stApp {
+    background: #0b1120;
+    color: #e8e4d9;
+}
 
-    st.write(answer)
+/* ── Hide Streamlit chrome ── */
+#MainMenu, footer, header { visibility: hidden; }
+.block-container { padding: 0 !important; max-width: 100% !important; }
 
-    st.subheader("Sources")
+/* ── Sidebar ── */
+[data-testid="stSidebar"] {
+    background: #0d1527 !important;
+    border-right: 1px solid #1e2d4a;
+}
+[data-testid="stSidebar"] * { color: #a0aec0 !important; }
 
-    for chunk in chunks:
-        meta = chunk["metadata"]
+/* ── Page shell ── */
+.rag-shell {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto 1fr;
+    min-height: 100vh;
+    gap: 0;
+}
 
-        st.write(
-            f"{meta['filename']} "
-            f"(Page {meta['page_number']})"
+/* ── Header ── */
+.rag-header {
+    grid-column: 1 / -1;
+    background: linear-gradient(135deg, #0d1527 0%, #0b1120 60%, #13203a 100%);
+    border-bottom: 1px solid #1e2d4a;
+    padding: 2.5rem 3rem 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+.rag-header::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(200,155,60,0.12) 0%, transparent 70%);
+    pointer-events: none;
+}
+.header-crest {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #c89b3c, #e8c56a);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.8rem;
+    flex-shrink: 0;
+    box-shadow: 0 4px 24px rgba(200,155,60,0.3);
+}
+.header-text h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: #f0ead6;
+    margin: 0 0 0.15rem;
+    letter-spacing: -0.02em;
+}
+.header-text p {
+    font-size: 0.82rem;
+    color: #6b7fa3;
+    margin: 0;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+.header-badge {
+    margin-left: auto;
+    background: rgba(200,155,60,0.1);
+    border: 1px solid rgba(200,155,60,0.3);
+    color: #c89b3c;
+    font-size: 0.72rem;
+    font-weight: 500;
+    padding: 0.3rem 0.9rem;
+    border-radius: 999px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+}
+
+/* ── Query panel ── */
+.query-panel {
+    grid-column: 1 / -1;
+    background: #0d1527;
+    border-bottom: 1px solid #1e2d4a;
+    padding: 2rem 3rem;
+}
+.query-label {
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #6b7fa3;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 0.75rem;
+}
+
+/* ── Streamlit input overrides ── */
+.stTextInput > div > div {
+    background: #111c33 !important;
+    border: 1px solid #2a3a5c !important;
+    border-radius: 10px !important;
+    color: #e8e4d9 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 1rem !important;
+    transition: border-color 0.2s;
+}
+.stTextInput > div > div:focus-within {
+    border-color: #c89b3c !important;
+    box-shadow: 0 0 0 3px rgba(200,155,60,0.12) !important;
+}
+.stTextInput input { color: #e8e4d9 !important; }
+.stTextInput input::placeholder { color: #3d5078 !important; }
+
+/* ── Ask button ── */
+.stButton > button {
+    background: linear-gradient(135deg, #c89b3c, #d4a843) !important;
+    color: #0b1120 !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.9rem !important;
+    letter-spacing: 0.03em !important;
+    border: none !important;
+    border-radius: 10px !important;
+    padding: 0.6rem 2rem !important;
+    cursor: pointer !important;
+    transition: opacity 0.2s, transform 0.1s !important;
+    box-shadow: 0 4px 16px rgba(200,155,60,0.25) !important;
+}
+.stButton > button:hover {
+    opacity: 0.9 !important;
+    transform: translateY(-1px) !important;
+}
+.stButton > button:active { transform: translateY(0) !important; }
+
+/* ── Answer panel ── */
+.answer-panel {
+    grid-column: 1;
+    padding: 2.5rem 3rem;
+    border-right: 1px solid #1e2d4a;
+    min-height: 60vh;
+}
+.sources-panel {
+    grid-column: 2;
+    padding: 2.5rem 2.5rem;
+    background: #0a1020;
+}
+
+/* ── Section labels ── */
+.panel-label {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #4a5e80;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+.panel-label::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #1e2d4a;
+}
+
+/* ── Answer card ── */
+.answer-card {
+    background: #111c33;
+    border: 1px solid #1e2d4a;
+    border-radius: 14px;
+    padding: 1.8rem 2rem;
+    font-size: 0.97rem;
+    line-height: 1.8;
+    color: #d4cfc4;
+    font-family: 'DM Sans', sans-serif;
+}
+.answer-card p { margin: 0 0 0.8rem; }
+.answer-card p:last-child { margin-bottom: 0; }
+
+/* ── Conflict alert ── */
+.conflict-alert {
+    background: linear-gradient(135deg, rgba(220,80,50,0.1), rgba(180,50,30,0.06));
+    border: 1px solid rgba(220,80,50,0.35);
+    border-left: 3px solid #dc5032;
+    border-radius: 10px;
+    padding: 1rem 1.2rem;
+    margin-bottom: 1.2rem;
+    font-size: 0.88rem;
+    color: #f0a090;
+    line-height: 1.7;
+}
+.conflict-alert strong {
+    color: #e8705a;
+    font-size: 0.75rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 0.4rem;
+}
+
+/* ── Empty / placeholder ── */
+.placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 40vh;
+    color: #2a3a5c;
+    text-align: center;
+    gap: 1rem;
+}
+.placeholder-icon { font-size: 3rem; opacity: 0.4; }
+.placeholder-text { font-size: 0.9rem; line-height: 1.6; max-width: 280px; }
+
+/* ── Source chips ── */
+.source-chip {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.85rem;
+    background: #111c33;
+    border: 1px solid #1e2d4a;
+    border-radius: 10px;
+    padding: 0.85rem 1rem;
+    margin-bottom: 0.7rem;
+    transition: border-color 0.15s;
+}
+.source-chip:hover { border-color: #2e4268; }
+.source-chip-num {
+    background: rgba(200,155,60,0.15);
+    color: #c89b3c;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 500;
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+}
+.source-chip-body {}
+.source-chip-file {
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    color: #8b9fc4;
+    margin-bottom: 0.2rem;
+    word-break: break-all;
+}
+.source-chip-page {
+    font-size: 0.7rem;
+    color: #4a5e80;
+}
+
+/* ── Chunks expander ── */
+.chunk-card {
+    background: #0d1527;
+    border: 1px solid #1a2740;
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+    margin-bottom: 0.8rem;
+    font-family: 'DM Mono', monospace;
+    font-size: 0.72rem;
+    line-height: 1.7;
+    color: #5a7098;
+    overflow-x: auto;
+}
+
+/* ── Spinner ── */
+.stSpinner > div { border-top-color: #c89b3c !important; }
+
+/* ── Expander ── */
+details { border: 1px solid #1e2d4a !important; border-radius: 10px !important;
+          background: #0a1020 !important; margin-top: 1.5rem; }
+summary { color: #6b7fa3 !important; font-size: 0.8rem !important;
+          padding: 0.7rem 1rem !important; cursor: pointer; }
+</style>
+""", unsafe_allow_html=True)
+
+
+# ── Helper: detect conflict in answer text ─────────────────────────────────────
+def has_conflict(text: str) -> bool:
+    markers = ["⚠", "conflict", "contradicts", "discrepancy", "inconsistent", "two different"]
+    return any(m.lower() in text.lower() for m in markers)
+
+
+def render_answer(text: str):
+    """Split answer into conflict block + body, render each appropriately."""
+    lines = text.strip().split("\n")
+    conflict_lines, body_lines = [], []
+    in_conflict = False
+
+    for line in lines:
+        if any(m in line.lower() for m in ["⚠", "conflict detected"]):
+            in_conflict = True
+        if in_conflict:
+            conflict_lines.append(line)
+            # end conflict block at blank line after it starts
+            if line.strip() == "" and len(conflict_lines) > 2:
+                in_conflict = False
+        else:
+            body_lines.append(line)
+
+    if conflict_lines:
+        conflict_html = "\n".join(conflict_lines).strip()
+        st.markdown(
+            f'<div class="conflict-alert"><strong>⚠ Conflict Detected</strong>{conflict_html}</div>',
+            unsafe_allow_html=True
         )
 
-    with st.expander("Retrieved Chunks"):
-        for chunk in chunks:
-            st.write(chunk["text"])
-            st.divider()
+    body = "\n".join(body_lines).strip()
+    if body:
+        st.markdown(f'<div class="answer-card">{body}</div>', unsafe_allow_html=True)
+
+
+# ── Header ─────────────────────────────────────────────────────────────────────
+st.markdown("""
+<div class="rag-header">
+  <div class="header-crest">🎓</div>
+  <div class="header-text">
+    <h1>University RAG Assistant</h1>
+    <p>Stevens Institute of Technology · Document Intelligence</p>
+  </div>
+  <div class="header-badge">AI-Powered</div>
+</div>
+""", unsafe_allow_html=True)
+
+
+# ── Query bar ──────────────────────────────────────────────────────────────────
+st.markdown('<div class="query-panel">', unsafe_allow_html=True)
+st.markdown('<div class="query-label">Ask a question about Stevens documents</div>', unsafe_allow_html=True)
+
+col_input, col_btn = st.columns([5, 1])
+with col_input:
+    question = st.text_input(
+        label="question",
+        label_visibility="collapsed",
+        placeholder="e.g. What is the graduate fall priority deadline?",
+        key="question_input",
+    )
+with col_btn:
+    ask = st.button("Ask →", use_container_width=True)
+
+st.markdown('</div>', unsafe_allow_html=True)
+
+
+# ── Results ────────────────────────────────────────────────────────────────────
+col_ans, col_src = st.columns([1, 1])
+
+if ask and question.strip():
+    with st.spinner("Searching documents…"):
+        answer, chunks = ask_university_bot(question.strip())
+
+    # deduplicate sources by (filename, page)
+    seen_sources, unique_chunks = set(), []
+    for c in chunks:
+        key = (c["metadata"].get("filename", ""), c["metadata"].get("page_number", ""))
+        if key not in seen_sources:
+            seen_sources.add(key)
+            unique_chunks.append(c)
+
+    with col_ans:
+        st.markdown('<div class="panel-label">Answer</div>', unsafe_allow_html=True)
+        render_answer(answer)
+
+    with col_src:
+        st.markdown('<div class="panel-label">Sources</div>', unsafe_allow_html=True)
+        for i, chunk in enumerate(unique_chunks, 1):
+            meta = chunk["metadata"]
+            fname = meta.get("filename", "unknown")
+            page  = meta.get("page_number", "?")
+            st.markdown(f"""
+            <div class="source-chip">
+              <div class="source-chip-num">{i}</div>
+              <div class="source-chip-body">
+                <div class="source-chip-file">{fname}</div>
+                <div class="source-chip-page">Page {page}</div>
+              </div>
+            </div>""", unsafe_allow_html=True)
+
+        with st.expander(f"View {len(chunks)} retrieved chunks"):
+            for i, chunk in enumerate(chunks, 1):
+                meta = chunk["metadata"]
+                st.markdown(
+                    f'<div class="chunk-card">'
+                    f'<span style="color:#c89b3c;font-weight:600">Chunk {i}</span>'
+                    f' · {meta.get("filename","?")} p.{meta.get("page_number","?")}<br><br>'
+                    f'{chunk["text"]}'
+                    f'</div>',
+                    unsafe_allow_html=True
+                )
+
+else:
+    with col_ans:
+        st.markdown('<div class="panel-label">Answer</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="placeholder">
+          <div class="placeholder-icon">◈</div>
+          <div class="placeholder-text">
+            Type a question about admissions, tuition, deadlines,
+            courses, or international student policies.
+          </div>
+        </div>""", unsafe_allow_html=True)
+
+    with col_src:
+        st.markdown('<div class="panel-label">Sources</div>', unsafe_allow_html=True)
+        st.markdown("""
+        <div class="placeholder">
+          <div class="placeholder-icon">◇</div>
+          <div class="placeholder-text">
+            Retrieved document chunks will appear here after you ask a question.
+          </div>
+        </div>""", unsafe_allow_html=True)
