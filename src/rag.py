@@ -1,36 +1,22 @@
-import os
-from dotenv import load_dotenv
-
 import chromadb
-from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
-from openai import OpenAI
+import ollama
 
-
-load_dotenv()
 
 CHROMA_DIR = "chroma_db"
 COLLECTION_NAME = "university_docs"
 
 
 def get_collection():
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-
-    embedding_function = OpenAIEmbeddingFunction(
-        api_key=openai_api_key,
-        model_name="text-embedding-3-small"
-    )
-
     client = chromadb.PersistentClient(path=CHROMA_DIR)
 
     collection = client.get_or_create_collection(
-        name=COLLECTION_NAME,
-        embedding_function=embedding_function
+        name=COLLECTION_NAME
     )
 
     return collection
 
 
-def retrieve_chunks(question: str, top_k: int = 5):
+def retrieve_chunks(question, top_k=5):
     collection = get_collection()
 
     results = collection.query(
@@ -40,55 +26,47 @@ def retrieve_chunks(question: str, top_k: int = 5):
 
     chunks = []
 
-    documents = results["documents"][0]
-    metadatas = results["metadatas"][0]
-    distances = results["distances"][0]
+    docs = results["documents"][0]
+    metas = results["metadatas"][0]
 
-    for doc, metadata, distance in zip(documents, metadatas, distances):
+    for doc, meta in zip(docs, metas):
         chunks.append({
             "text": doc,
-            "metadata": metadata,
-            "distance": distance
+            "metadata": meta
         })
 
     return chunks
 
 
 def build_context(chunks):
-    context_parts = []
+    context = ""
 
     for i, chunk in enumerate(chunks, start=1):
-        metadata = chunk["metadata"]
+        meta = chunk["metadata"]
 
-        source_label = (
-            f"Source {i}: "
-            f"{metadata['filename']}, "
-            f"page {metadata['page_number']}"
-        )
+        context += f"""
+Source {i}
+File: {meta['filename']}
+Page: {meta['page_number']}
 
-        context_parts.append(
-            f"{source_label}\n{chunk['text']}"
-        )
+{chunk['text']}
 
-    return "\n\n---\n\n".join(context_parts)
+---
+"""
+
+    return context
 
 
-def generate_answer(question: str, chunks):
-    client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
-
+def generate_answer(question, chunks):
     context = build_context(chunks)
 
     prompt = f"""
 You are a University RAG Assistant.
 
-Answer the student's question ONLY using the provided context.
+Answer ONLY using the context below.
 
-Rules:
-1. If the answer is not in the context, say:
-   "I don't know based on the provided university documents."
-2. Do not make up deadlines, fees, requirements, policies, or course details.
-3. Keep the answer clear and student-friendly.
-4. Mention the source document/page in the answer when useful.
+If the answer is not present, say:
+"I don't know based on the university documents."
 
 Question:
 {question}
@@ -97,30 +75,18 @@ Context:
 {context}
 """
 
-    response = client.chat.completions.create(
-        model="gpt-4.1-mini",
+    response = ollama.chat(
+        model="gemma:2b",
         messages=[
-            {"role": "system", "content": "You answer only from provided university documents."},
             {"role": "user", "content": prompt}
-        ],
-        temperature=0
+        ]
     )
 
-    return response.choices[0].message.content
+    return response["message"]["content"]
 
 
-def ask_university_bot(question: str, top_k: int = 5):
-    chunks = retrieve_chunks(question, top_k=top_k)
+def ask_university_bot(question, top_k=5):
+    chunks = retrieve_chunks(question, top_k)
     answer = generate_answer(question, chunks)
 
-    sources = []
-
-    for chunk in chunks:
-        metadata = chunk["metadata"]
-        sources.append({
-            "filename": metadata["filename"],
-            "page_number": metadata["page_number"],
-            "chunk_number": metadata["chunk_number"]
-        })
-
-    return answer, sources, chunks
+    return answer, chunks

@@ -1,14 +1,9 @@
-import os
 from pathlib import Path
 from typing import List, Dict
 
-from dotenv import load_dotenv
 from pypdf import PdfReader
 import chromadb
-from chromadb.utils.embedding_functions import OpenAIEmbeddingFunction
 
-
-load_dotenv()
 
 DATA_DIR = Path("data")
 CHROMA_DIR = "chroma_db"
@@ -16,10 +11,6 @@ COLLECTION_NAME = "university_docs"
 
 
 def load_pdf_pages(file_path: Path) -> List[Dict]:
-    """
-    Extract text page by page from a PDF.
-    Each page becomes a raw document before chunking.
-    """
     reader = PdfReader(str(file_path))
     pages = []
 
@@ -36,11 +27,7 @@ def load_pdf_pages(file_path: Path) -> List[Dict]:
     return pages
 
 
-def split_text(text: str, chunk_size: int = 900, overlap: int = 150) -> List[str]:
-    """
-    Simple character-based chunking.
-    Good enough for version 1.
-    """
+def split_text(text, chunk_size=900, overlap=150):
     chunks = []
     start = 0
 
@@ -57,21 +44,10 @@ def split_text(text: str, chunk_size: int = 900, overlap: int = 150) -> List[str
 
 
 def ingest_documents():
-    openai_api_key = os.getenv("OPENAI_API_KEY")
-
-    if not openai_api_key:
-        raise ValueError("OPENAI_API_KEY is missing. Add it to your .env file.")
-
-    embedding_function = OpenAIEmbeddingFunction(
-        api_key=openai_api_key,
-        model_name="text-embedding-3-small"
-    )
-
     client = chromadb.PersistentClient(path=CHROMA_DIR)
 
     collection = client.get_or_create_collection(
-        name=COLLECTION_NAME,
-        embedding_function=embedding_function
+        name=COLLECTION_NAME
     )
 
     all_ids = []
@@ -81,11 +57,11 @@ def ingest_documents():
     pdf_files = list(DATA_DIR.glob("*.pdf"))
 
     if not pdf_files:
-        print("No PDF files found in data/ folder.")
+        print("No PDFs found in data folder.")
         return
 
     for pdf_file in pdf_files:
-        print(f"Processing: {pdf_file.name}")
+        print(f"Processing {pdf_file.name}")
 
         pages = load_pdf_pages(pdf_file)
 
@@ -93,7 +69,7 @@ def ingest_documents():
             chunks = split_text(page["text"])
 
             for chunk_index, chunk in enumerate(chunks):
-                chunk_id = f"{page['filename']}_page_{page['page_number']}_chunk_{chunk_index}"
+                chunk_id = f"{page['filename']}_{page['page_number']}_{chunk_index}"
 
                 metadata = {
                     "filename": page["filename"],
@@ -105,14 +81,13 @@ def ingest_documents():
                 all_documents.append(chunk)
                 all_metadatas.append(metadata)
 
-    if all_documents:
-        collection.add(
-            ids=all_ids,
-            documents=all_documents,
-            metadatas=all_metadatas
-        )
+    collection.add(
+        ids=all_ids,
+        documents=all_documents,
+        metadatas=all_metadatas
+    )
 
-    print(f"Ingestion complete. Added {len(all_documents)} chunks.")
+    print(f"Added {len(all_documents)} chunks.")
 
 
 if __name__ == "__main__":

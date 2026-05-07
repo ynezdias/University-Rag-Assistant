@@ -1,6 +1,4 @@
 chromadb
 pypdf
-python-dotenv
 streamlit
-sentence-transformers
 ollama
