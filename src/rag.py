@@ -1,14 +1,8 @@
-"""
-Stevens University RAG Assistant — rag.py
-Fixes applied vs. original:
-  1. Real sentence-transformer embeddings (all-MiniLM-L6-v2) replace MD5 hash vectors
-  2. top_k raised to 8 so conflict-bearing chunks are more likely to co-appear
-  3. Conflict-aware prompt: LLM is explicitly told to flag contradictions
-  4. Source deduplication in context builder (same page shown once)
-  5. Graceful fallback if sentence-transformers not installed
-"""
-
 import os
+os.environ["OPENBLAS_NUM_THREADS"] = "1"
+os.environ["OMP_NUM_THREADS"] = "1"
+os.environ["MKL_NUM_THREADS"] = "1"
+
 import re
 import math
 import hashlib
@@ -19,48 +13,42 @@ from groq import Groq
 
 load_dotenv()
 
-CHROMA_DIR   = "chroma_db"
-COLLECTION   = "university_docs"
+CHROMA_DIR = "chroma_db"
+COLLECTION = "university_docs"
 
-# ── Embedding ──────────────────────────────────────────────────────────────────
-# Try real semantic embeddings first; fall back to improved hash embedder.
+
+# ── Embedding (must match ingest.py exactly) ───────────────────────────────────
 
 def _load_encoder():
     try:
         from sentence_transformers import SentenceTransformer
-        model = SentenceTransformer("all-MiniLM-L6-v2")   # 384-dim, fast, free
+        model = SentenceTransformer("all-MiniLM-L6-v2")
         print("[rag] Using sentence-transformers (semantic embeddings)")
         return model
     except ImportError:
         print("[rag] sentence-transformers not found — using hash fallback.")
-        print("      Install with:  pip install sentence-transformers")
         return None
-# code
-_ENCODER = _load_encoder()
+
+_ENCODER  = _load_encoder()
 EMBED_DIM = 384
-# code
+
+
 def embed(text: str) -> list[float]:
-    """Return a normalised 384-d embedding for text."""
     if _ENCODER is not None:
-        vec = _ENCODER.encode(text, normalize_embeddings=True).tolist()
-        return vec
-    # ── Fallback: character-level bigram + word hashing (better than plain MD5 word hash)
+        return _ENCODER.encode(text, normalize_embeddings=True).tolist()
     vector = [0.0] * EMBED_DIM
     text_l = text.lower()
-    # word-level
     for word in re.findall(r"\b\w+\b", text_l):
         idx = int(hashlib.md5(word.encode()).hexdigest(), 16) % EMBED_DIM
         vector[idx] += 1.0
-    # bigram-level (adds some positional signal)
     for a, b in zip(text_l, text_l[1:]):
-        bigram = a + b
-        idx = int(hashlib.sha1(bigram.encode()).hexdigest(), 16) % EMBED_DIM
+        idx = int(hashlib.sha1((a+b).encode()).hexdigest(), 16) % EMBED_DIM
         vector[idx] += 0.5
     norm = math.sqrt(sum(x * x for x in vector))
     return [x / norm for x in vector] if norm > 0 else vector
 
 
-# ── ChromaDB helpers ───────────────────────────────────────────────────────────
+# ── ChromaDB ───────────────────────────────────────────────────────────────────
 
 def get_collection():
     client = chromadb.PersistentClient(path=CHROMA_DIR)
@@ -68,13 +56,8 @@ def get_collection():
 
 
 def retrieve_chunks(question: str, top_k: int = 8) -> list[dict]:
-    """
-    Retrieve top_k chunks most relevant to *question*.
-    top_k defaults to 8 (was 5) so overlapping/conflicting chunks
-    from different document sections are more likely to both appear.
-    """
     collection = get_collection()
-    results = collection.query(
+    results    = collection.query(
         query_embeddings=[embed(question)],
         n_results=top_k,
     )
@@ -88,30 +71,21 @@ def retrieve_chunks(question: str, top_k: int = 8) -> list[dict]:
 
 def build_context(chunks: list[dict]) -> str:
     """
-    Build a numbered context string.
-    Deduplicates by (filename, page_number) so the same page
-    doesn't crowd out other sources.
+    No page-level deduplication — two chunks from the same page
+    can carry conflicting values and must appear as separate sources.
     """
-    unique = chunks
-    # seen   = set()
-    # unique = []
-    # for chunk in chunks:
-    #     m   = chunk["metadata"]
-    #     key = (m.get("filename", ""), m.get("page_number", ""))
-    #     if key not in seen:
-    #         seen.add(key)
-    #         unique.append(chunk)
-
     parts = []
-    for i, chunk in enumerate(unique, 1):
+    for i, chunk in enumerate(chunks, 1):
         m = chunk["metadata"]
         parts.append(
             f"[Source {i}]\n"
             f"File: {m.get('filename', 'unknown')}\n"
-            f"Page: {m.get('page_number', '?')}\n\n"
+            f"Page: {m.get('page_number', '?')}  |  "
+            f"Chunk: {m.get('chunk_number', '?')}\n\n"
             f"{chunk['text'].strip()}\n"
         )
     return "\n---\n".join(parts)
+
 
 # ── Prompt ─────────────────────────────────────────────────────────────────────
 
@@ -119,8 +93,8 @@ SYSTEM_PROMPT = """\
 You are a University RAG Assistant for Stevens Institute of Technology.
 Your job is to answer student questions using ONLY the provided source excerpts.
 
-Each source has a File name and a Page number. Some sources also carry a
-publication date in their header (e.g. "Published: August 2024").
+Each source has a File name, Page number, and Chunk number.
+Some sources carry a publication date in their header (e.g. "Published: August 2024").
 
 ── CONFLICT RESOLUTION RULES (follow in this exact order) ──────────────────
 
@@ -142,7 +116,7 @@ publication dates are visible in the source headers:
      ✓ Based on the more recent document [Source N] (filename, published DATE):
      [your answer here]
 
-     ⚠ Conflict detected: [Source M] (filename, published DATE) states [OTHER VALUE].
+     ⚠ Conflict detected: [Source M] (filename, page X, chunk Y) states [OTHER VALUE].
      Because [Source N] is more recent, its value is preferred — but please
      confirm with the relevant office before acting on this information.
 
@@ -153,8 +127,8 @@ If sources conflict but no publication dates are visible:
   c. Format your response exactly like this:
 
      ⚠ Conflict detected — unable to determine which source is more recent:
-     • [Source N] (filename, page X) states: [VALUE 1]
-     • [Source M] (filename, page Y) states: [VALUE 2]
+     • [Source N] (filename, page X, chunk Y) states: [VALUE 1]
+     • [Source M] (filename, page X, chunk Y) states: [VALUE 2]
      We recommend verifying this directly with the relevant Stevens office.
 
 RULE 5 — NO RELEVANT INFORMATION
@@ -166,29 +140,26 @@ exactly: "I don't know based on the university documents."
 - NEVER invent, assume, or infer information not present in the sources.
 - ALWAYS cite every claim with its [Source N] tag.
 - Keep answers concise. Use bullet points for lists of requirements or dates.
-- When flagging a conflict, quote the exact values from each source —
-  do not paraphrase dates or numbers.
+- When flagging a conflict, quote the exact values — do not paraphrase dates or numbers.
+- Two chunks from the same file but different chunk numbers are treated as
+  separate sources and may still conflict with each other.
 """
 
 
 def generate_answer(question: str, chunks: list[dict]) -> str:
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
-        return "❌ GROQ_API_KEY missing — add it to your .env file."
+        return "GROQ_API_KEY missing — add it to your .env file."
 
     context = build_context(chunks)
     if not context.strip():
         return "I don't know based on the university documents."
 
-    user_message = f"""Question: {question}
-
-Sources:
-{context}
-"""
+    user_message = f"Question: {question}\n\nSources:\n{context}"
 
     client   = Groq(api_key=api_key)
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",   # stronger model → better conflict reasoning
+        model="llama-3.3-70b-versatile",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user",   "content": user_message},
@@ -202,16 +173,12 @@ Sources:
 # ── Public API ─────────────────────────────────────────────────────────────────
 
 def ask_university_bot(question: str, top_k: int = 8) -> tuple[str, list[dict]]:
-    """
-    Returns (answer_text, retrieved_chunks).
-    Drop-in replacement for the original function signature.
-    """
     chunks = retrieve_chunks(question, top_k)
     answer = generate_answer(question, chunks)
     return answer, chunks
 
 
-# ── CLI convenience ────────────────────────────────────────────────────────────
+# ── CLI ────────────────────────────────────────────────────────────────────────
 
 if __name__ == "__main__":
     import sys
@@ -225,4 +192,4 @@ if __name__ == "__main__":
     print("="*60)
     for i, c in enumerate(chunks, 1):
         m = c["metadata"]
-        print(f"  [{i}] {m.get('filename','?')}  p.{m.get('page_number','?')}")
+        print(f"  [{i}] {m.get('filename','?')}  p.{m.get('page_number','?')}  chunk {m.get('chunk_number','?')}")

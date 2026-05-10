@@ -12,39 +12,17 @@ st.markdown("""
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap');
 
-/* ── Reset & base ── */
-html, body, [class*="css"] {
-    font-family: 'DM Sans', sans-serif;
-}
+html, body, [class*="css"] { font-family: 'DM Sans', sans-serif; }
 
-.stApp {
-    background: #0b1120;
-    color: #e8e4d9;
-}
+.stApp { background: #0b1120; color: #e8e4d9; }
 
-/* ── Hide Streamlit chrome ── */
 #MainMenu, footer, header { visibility: hidden; }
 .block-container { padding: 0 !important; max-width: 100% !important; }
 
-/* ── Sidebar ── */
-[data-testid="stSidebar"] {
-    background: #0d1527 !important;
-    border-right: 1px solid #1e2d4a;
-}
+[data-testid="stSidebar"] { background: #0d1527 !important; border-right: 1px solid #1e2d4a; }
 [data-testid="stSidebar"] * { color: #a0aec0 !important; }
 
-/* ── Page shell ── */
-.rag-shell {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto 1fr;
-    min-height: 100vh;
-    gap: 0;
-}
-
-/* ── Header ── */
 .rag-header {
-    grid-column: 1 / -1;
     background: linear-gradient(135deg, #0d1527 0%, #0b1120 60%, #13203a 100%);
     border-bottom: 1px solid #1e2d4a;
     padding: 2.5rem 3rem 2rem;
@@ -79,13 +57,7 @@ html, body, [class*="css"] {
     margin: 0 0 0.15rem;
     letter-spacing: -0.02em;
 }
-.header-text p {
-    font-size: 0.82rem;
-    color: #6b7fa3;
-    margin: 0;
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-}
+.header-text p { font-size: 0.82rem; color: #6b7fa3; margin: 0; letter-spacing: 0.04em; text-transform: uppercase; }
 .header-badge {
     margin-left: auto;
     background: rgba(200,155,60,0.1);
@@ -99,9 +71,7 @@ html, body, [class*="css"] {
     text-transform: uppercase;
 }
 
-/* ── Query panel ── */
 .query-panel {
-    grid-column: 1 / -1;
     background: #0d1527;
     border-bottom: 1px solid #1e2d4a;
     padding: 2rem 3rem;
@@ -115,7 +85,6 @@ html, body, [class*="css"] {
     margin-bottom: 0.75rem;
 }
 
-/* ── Streamlit input overrides ── */
 .stTextInput > div > div {
     background: #111c33 !important;
     border: 1px solid #2a3a5c !important;
@@ -123,7 +92,6 @@ html, body, [class*="css"] {
     color: #e8e4d9 !important;
     font-family: 'DM Sans', sans-serif !important;
     font-size: 1rem !important;
-    transition: border-color 0.2s;
 }
 .stTextInput > div > div:focus-within {
     border-color: #c89b3c !important;
@@ -132,7 +100,6 @@ html, body, [class*="css"] {
 .stTextInput input { color: #e8e4d9 !important; }
 .stTextInput input::placeholder { color: #3d5078 !important; }
 
-/* ── Ask button ── */
 .stButton > button {
     background: linear-gradient(135deg, #c89b3c, #d4a843) !important;
     color: #0b1120 !important;
@@ -143,30 +110,12 @@ html, body, [class*="css"] {
     border: none !important;
     border-radius: 10px !important;
     padding: 0.6rem 2rem !important;
-    cursor: pointer !important;
-    transition: opacity 0.2s, transform 0.1s !important;
     box-shadow: 0 4px 16px rgba(200,155,60,0.25) !important;
+    transition: opacity 0.2s, transform 0.1s !important;
 }
-.stButton > button:hover {
-    opacity: 0.9 !important;
-    transform: translateY(-1px) !important;
-}
+.stButton > button:hover { opacity: 0.9 !important; transform: translateY(-1px) !important; }
 .stButton > button:active { transform: translateY(0) !important; }
 
-/* ── Answer panel ── */
-.answer-panel {
-    grid-column: 1;
-    padding: 2.5rem 3rem;
-    border-right: 1px solid #1e2d4a;
-    min-height: 60vh;
-}
-.sources-panel {
-    grid-column: 2;
-    padding: 2.5rem 2.5rem;
-    background: #0a1020;
-}
-
-/* ── Section labels ── */
 .panel-label {
     font-size: 0.68rem;
     font-weight: 600;
@@ -178,14 +127,8 @@ html, body, [class*="css"] {
     align-items: center;
     gap: 0.6rem;
 }
-.panel-label::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: #1e2d4a;
-}
+.panel-label::after { content: ''; flex: 1; height: 1px; background: #1e2d4a; }
 
-/* ── Answer card ── */
 .answer-card {
     background: #111c33;
     border: 1px solid #1e2d4a;
@@ -194,47 +137,8 @@ html, body, [class*="css"] {
     font-size: 0.97rem;
     line-height: 1.8;
     color: #d4cfc4;
-    font-family: 'DM Sans', sans-serif;
-}
-.answer-card p { margin: 0 0 0.8rem; }
-.answer-card p:last-child { margin-bottom: 0; }
-
-/* ── Conflict alert ── */
-.conflict-alert {
-    background: linear-gradient(135deg, rgba(220,80,50,0.1), rgba(180,50,30,0.06));
-    border: 1px solid rgba(220,80,50,0.35);
-    border-left: 3px solid #dc5032;
-    border-radius: 10px;
-    padding: 1rem 1.2rem;
-    margin-bottom: 1.2rem;
-    font-size: 0.88rem;
-    color: #f0a090;
-    line-height: 1.7;
-}
-.conflict-alert strong {
-    color: #e8705a;
-    font-size: 0.75rem;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    display: block;
-    margin-bottom: 0.4rem;
 }
 
-/* ── Empty / placeholder ── */
-.placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 40vh;
-    color: #2a3a5c;
-    text-align: center;
-    gap: 1rem;
-}
-.placeholder-icon { font-size: 3rem; opacity: 0.4; }
-.placeholder-text { font-size: 0.9rem; line-height: 1.6; max-width: 280px; }
-
-/* ── Source chips ── */
 .source-chip {
     display: flex;
     align-items: flex-start;
@@ -259,20 +163,9 @@ html, body, [class*="css"] {
     flex-shrink: 0;
     margin-top: 1px;
 }
-.source-chip-body {}
-.source-chip-file {
-    font-family: 'DM Mono', monospace;
-    font-size: 0.72rem;
-    color: #8b9fc4;
-    margin-bottom: 0.2rem;
-    word-break: break-all;
-}
-.source-chip-page {
-    font-size: 0.7rem;
-    color: #4a5e80;
-}
+.source-chip-file { font-family: 'DM Mono', monospace; font-size: 0.72rem; color: #8b9fc4; margin-bottom: 0.2rem; word-break: break-all; }
+.source-chip-page { font-size: 0.7rem; color: #4a5e80; }
 
-/* ── Chunks expander ── */
 .chunk-card {
     background: #0d1527;
     border: 1px solid #1a2740;
@@ -283,57 +176,46 @@ html, body, [class*="css"] {
     font-size: 0.72rem;
     line-height: 1.7;
     color: #5a7098;
-    overflow-x: auto;
 }
 
-/* ── Spinner ── */
-.stSpinner > div { border-top-color: #c89b3c !important; }
+.placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 40vh;
+    color: #2a3a5c;
+    text-align: center;
+    gap: 1rem;
+}
+.placeholder-icon { font-size: 3rem; opacity: 0.4; }
+.placeholder-text { font-size: 0.9rem; line-height: 1.6; max-width: 280px; }
 
-/* ── Expander ── */
-details { border: 1px solid #1e2d4a !important; border-radius: 10px !important;
-          background: #0a1020 !important; margin-top: 1.5rem; }
-summary { color: #6b7fa3 !important; font-size: 0.8rem !important;
-          padding: 0.7rem 1rem !important; cursor: pointer; }
+.stSpinner > div { border-top-color: #c89b3c !important; }
+details { border: 1px solid #1e2d4a !important; border-radius: 10px !important; background: #0a1020 !important; margin-top: 1.5rem; }
+summary { color: #6b7fa3 !important; font-size: 0.8rem !important; padding: 0.7rem 1rem !important; cursor: pointer; }
 </style>
 """, unsafe_allow_html=True)
 
 
-# ── Helper: detect conflict in answer text ─────────────────────────────────────
-def has_conflict(text: str) -> bool:
-    markers = ["⚠", "conflict", "contradicts", "discrepancy", "inconsistent", "two different"]
-    return any(m.lower() in text.lower() for m in markers)
-
+# ── Answer renderer ────────────────────────────────────────────────────────────
 
 def render_answer(text: str):
-    """
-    Renders the LLM answer with styled blocks:
-      - Lines starting with ✓  → green 'preferred answer' card
-      - Lines starting with ⚠  → red conflict alert card
-      - Everything else        → normal answer card
-    """
     lines = text.strip().split("\n")
-
-    preferred_lines = []
-    conflict_lines  = []
-    body_lines      = []
-
+    preferred_lines, conflict_lines, body_lines = [], [], []
     mode = "body"
 
     for line in lines:
         stripped = line.strip()
-
         if stripped.startswith("✓"):
             mode = "preferred"
         elif stripped.startswith("⚠"):
             mode = "conflict"
         elif stripped == "" and mode in ("preferred", "conflict"):
-            # blank line ends a special block — flush and reset
             if mode == "preferred":
                 preferred_lines.append(line)
             else:
                 conflict_lines.append(line)
-            if len([l for l in (preferred_lines + conflict_lines) if l.strip()]) > 1:
-                mode = "body"
             continue
 
         if mode == "preferred":
@@ -343,68 +225,38 @@ def render_answer(text: str):
         else:
             body_lines.append(line)
 
-    # ── Preferred answer block (green) ──
     if preferred_lines:
         content = "\n".join(preferred_lines).strip()
-        st.markdown(
-            f"""<div style="
-                background: linear-gradient(135deg, rgba(40,160,90,0.10), rgba(20,120,60,0.06));
-                border: 1px solid rgba(40,160,90,0.35);
-                border-left: 3px solid #28a05a;
-                border-radius: 10px;
-                padding: 1rem 1.2rem;
-                margin-bottom: 1rem;
-                font-size: 0.9rem;
-                color: #7ddba0;
-                line-height: 1.75;
-            ">
-                <strong style="color:#4cc87a;font-size:0.72rem;letter-spacing:0.08em;
-                               text-transform:uppercase;display:block;margin-bottom:0.4rem;">
-                    ✓ Preferred Answer (most recent source)
-                </strong>
-                {content}
-            </div>""",
-            unsafe_allow_html=True
-        )
+        st.markdown(f"""
+        <div style="background:linear-gradient(135deg,rgba(40,160,90,0.10),rgba(20,120,60,0.06));
+                    border:1px solid rgba(40,160,90,0.35);border-left:3px solid #28a05a;
+                    border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;
+                    font-size:0.9rem;color:#7ddba0;line-height:1.75;">
+            <strong style="color:#4cc87a;font-size:0.72rem;letter-spacing:0.08em;
+                           text-transform:uppercase;display:block;margin-bottom:0.4rem;">
+                ✓ Preferred Answer (most recent source)
+            </strong>{content}</div>""", unsafe_allow_html=True)
 
-    # ── Conflict alert block (red) ──
     if conflict_lines:
         content = "\n".join(conflict_lines).strip()
-        st.markdown(
-            f"""<div style="
-                background: linear-gradient(135deg, rgba(220,80,50,0.10), rgba(180,50,30,0.06));
-                border: 1px solid rgba(220,80,50,0.35);
-                border-left: 3px solid #dc5032;
-                border-radius: 10px;
-                padding: 1rem 1.2rem;
-                margin-bottom: 1rem;
-                font-size: 0.88rem;
-                color: #f0a090;
-                line-height: 1.75;
-            ">
-                <strong style="color:#e8705a;font-size:0.72rem;letter-spacing:0.08em;
-                               text-transform:uppercase;display:block;margin-bottom:0.4rem;">
-                    ⚠ Conflict Detected
-                </strong>
-                {content}
-            </div>""",
-            unsafe_allow_html=True
-        )
+        st.markdown(f"""
+        <div style="background:linear-gradient(135deg,rgba(220,80,50,0.10),rgba(180,50,30,0.06));
+                    border:1px solid rgba(220,80,50,0.35);border-left:3px solid #dc5032;
+                    border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;
+                    font-size:0.88rem;color:#f0a090;line-height:1.75;">
+            <strong style="color:#e8705a;font-size:0.72rem;letter-spacing:0.08em;
+                           text-transform:uppercase;display:block;margin-bottom:0.4rem;">
+                ⚠ Conflict Detected
+            </strong>{content}</div>""", unsafe_allow_html=True)
 
-    # ── Normal answer body ──
     body = "\n".join(body_lines).strip()
     if body:
-        st.markdown(
-            f'<div class="answer-card">{body}</div>',
-            unsafe_allow_html=True
-        )
+        st.markdown(f'<div class="answer-card">{body}</div>', unsafe_allow_html=True)
 
-    # ── Fallback: nothing rendered at all ──
     if not preferred_lines and not conflict_lines and not body:
-        st.markdown(
-            '<div class="answer-card">I don\'t know based on the university documents.</div>',
-            unsafe_allow_html=True
-        )
+        st.markdown('<div class="answer-card">I don\'t know based on the university documents.</div>', unsafe_allow_html=True)
+
+
 # ── Header ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="rag-header">
@@ -440,16 +292,8 @@ st.markdown('</div>', unsafe_allow_html=True)
 col_ans, col_src = st.columns([1, 1])
 
 if ask and question.strip():
-    with st.spinner("Searching documents…"):
+    with st.spinner("Searching documents..."):
         answer, chunks = ask_university_bot(question.strip())
-
-    # deduplicate sources by (filename, page)
-    seen_sources, unique_chunks = set(), []
-    for c in chunks:
-        key = (c["metadata"].get("filename", ""), c["metadata"].get("page_number", ""))
-        if key not in seen_sources:
-            seen_sources.add(key)
-            unique_chunks.append(c)
 
     with col_ans:
         st.markdown('<div class="panel-label">Answer</div>', unsafe_allow_html=True)
@@ -457,16 +301,17 @@ if ask and question.strip():
 
     with col_src:
         st.markdown('<div class="panel-label">Sources</div>', unsafe_allow_html=True)
-        for i, chunk in enumerate(unique_chunks, 1):
-            meta = chunk["metadata"]
+        for i, chunk in enumerate(chunks, 1):
+            meta  = chunk["metadata"]
             fname = meta.get("filename", "unknown")
             page  = meta.get("page_number", "?")
+            chunk_num = meta.get("chunk_number", "?")
             st.markdown(f"""
             <div class="source-chip">
               <div class="source-chip-num">{i}</div>
-              <div class="source-chip-body">
+              <div>
                 <div class="source-chip-file">{fname}</div>
-                <div class="source-chip-page">Page {page}</div>
+                <div class="source-chip-page">Page {page} · Chunk {chunk_num}</div>
               </div>
             </div>""", unsafe_allow_html=True)
 
@@ -476,7 +321,9 @@ if ask and question.strip():
                 st.markdown(
                     f'<div class="chunk-card">'
                     f'<span style="color:#c89b3c;font-weight:600">Chunk {i}</span>'
-                    f' · {meta.get("filename","?")} p.{meta.get("page_number","?")}<br><br>'
+                    f' · {meta.get("filename","?")} '
+                    f'p.{meta.get("page_number","?")} '
+                    f'c.{meta.get("chunk_number","?")}<br><br>'
                     f'{chunk["text"]}'
                     f'</div>',
                     unsafe_allow_html=True
