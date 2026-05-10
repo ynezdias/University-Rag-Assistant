@@ -305,34 +305,106 @@ def has_conflict(text: str) -> bool:
 
 
 def render_answer(text: str):
-    """Split answer into conflict block + body, render each appropriately."""
+    """
+    Renders the LLM answer with styled blocks:
+      - Lines starting with ✓  → green 'preferred answer' card
+      - Lines starting with ⚠  → red conflict alert card
+      - Everything else        → normal answer card
+    """
     lines = text.strip().split("\n")
-    conflict_lines, body_lines = [], []
-    in_conflict = False
+
+    preferred_lines = []
+    conflict_lines  = []
+    body_lines      = []
+
+    mode = "body"
 
     for line in lines:
-        if any(m in line.lower() for m in ["⚠", "conflict detected"]):
-            in_conflict = True
-        if in_conflict:
+        stripped = line.strip()
+
+        if stripped.startswith("✓"):
+            mode = "preferred"
+        elif stripped.startswith("⚠"):
+            mode = "conflict"
+        elif stripped == "" and mode in ("preferred", "conflict"):
+            # blank line ends a special block — flush and reset
+            if mode == "preferred":
+                preferred_lines.append(line)
+            else:
+                conflict_lines.append(line)
+            if len([l for l in (preferred_lines + conflict_lines) if l.strip()]) > 1:
+                mode = "body"
+            continue
+
+        if mode == "preferred":
+            preferred_lines.append(line)
+        elif mode == "conflict":
             conflict_lines.append(line)
-            # end conflict block at blank line after it starts
-            if line.strip() == "" and len(conflict_lines) > 2:
-                in_conflict = False
         else:
             body_lines.append(line)
 
-    if conflict_lines:
-        conflict_html = "\n".join(conflict_lines).strip()
+    # ── Preferred answer block (green) ──
+    if preferred_lines:
+        content = "\n".join(preferred_lines).strip()
         st.markdown(
-            f'<div class="conflict-alert"><strong>⚠ Conflict Detected</strong>{conflict_html}</div>',
+            f"""<div style="
+                background: linear-gradient(135deg, rgba(40,160,90,0.10), rgba(20,120,60,0.06));
+                border: 1px solid rgba(40,160,90,0.35);
+                border-left: 3px solid #28a05a;
+                border-radius: 10px;
+                padding: 1rem 1.2rem;
+                margin-bottom: 1rem;
+                font-size: 0.9rem;
+                color: #7ddba0;
+                line-height: 1.75;
+            ">
+                <strong style="color:#4cc87a;font-size:0.72rem;letter-spacing:0.08em;
+                               text-transform:uppercase;display:block;margin-bottom:0.4rem;">
+                    ✓ Preferred Answer (most recent source)
+                </strong>
+                {content}
+            </div>""",
             unsafe_allow_html=True
         )
 
+    # ── Conflict alert block (red) ──
+    if conflict_lines:
+        content = "\n".join(conflict_lines).strip()
+        st.markdown(
+            f"""<div style="
+                background: linear-gradient(135deg, rgba(220,80,50,0.10), rgba(180,50,30,0.06));
+                border: 1px solid rgba(220,80,50,0.35);
+                border-left: 3px solid #dc5032;
+                border-radius: 10px;
+                padding: 1rem 1.2rem;
+                margin-bottom: 1rem;
+                font-size: 0.88rem;
+                color: #f0a090;
+                line-height: 1.75;
+            ">
+                <strong style="color:#e8705a;font-size:0.72rem;letter-spacing:0.08em;
+                               text-transform:uppercase;display:block;margin-bottom:0.4rem;">
+                    ⚠ Conflict Detected
+                </strong>
+                {content}
+            </div>""",
+            unsafe_allow_html=True
+        )
+
+    # ── Normal answer body ──
     body = "\n".join(body_lines).strip()
     if body:
-        st.markdown(f'<div class="answer-card">{body}</div>', unsafe_allow_html=True)
+        st.markdown(
+            f'<div class="answer-card">{body}</div>',
+            unsafe_allow_html=True
+        )
 
-
+    # ── Fallback: nothing rendered at all ──
+    if not preferred_lines and not conflict_lines and not body:
+        st.markdown(
+            '<div class="answer-card">I don\'t know based on the university documents.</div>',
+            unsafe_allow_html=True
+        )
 # ── Header ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="rag-header">
