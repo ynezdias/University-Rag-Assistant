@@ -164,7 +164,7 @@ def ingest_documents():
             embeddings=all_embeds[sl],
         )
         print(f"  Upserted {min(start + BATCH, len(all_ids))}/{len(all_docs)} chunks")
-
+# code
     print(f"\nDone. {len(all_docs)} chunks stored in '{CHROMA_DIR}/{COLLECTION_NAME}'")
 
 
