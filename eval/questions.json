@@ -1,0 +1,366 @@
+[
+  {
+    "id": "course_cs583",
+    "question": "What is the prerequisite for CS 583?",
+    "expected_sources": [
+      "06_Course_Catalog_2026_2027.docx"
+    ],
+    "required_facts": [
+      "CS 559 or an approved equivalent"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "course_cs559",
+    "question": "What is the prerequisite for CS 559 Machine Learning?",
+    "expected_sources": [
+      "06_Course_Catalog_2026_2027.docx"
+    ],
+    "required_facts": [
+      "Linear algebra and probability/statistics"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "course_ds550",
+    "question": "What is the prerequisite for DS 550?",
+    "expected_sources": [
+      "06_Course_Catalog_2026_2027.docx"
+    ],
+    "required_facts": [
+      "DS 510 or an approved equivalent"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "course_ds510",
+    "question": "What prerequisite does DS 510 have?",
+    "expected_sources": [
+      "06_Course_Catalog_2026_2027.docx"
+    ],
+    "required_facts": [
+      "Introductory statistics"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "tuition_old",
+    "question": "What is graduate tuition per credit in 2025-2026?",
+    "expected_sources": [
+      "07_Tuition_Fees_2025_2026.docx"
+    ],
+    "required_facts": [
+      "$1,850"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "tuition_new",
+    "question": "What is graduate tuition per credit in 2026-2027?",
+    "expected_sources": [
+      "08_Tuition_Fees_2026_2027.docx"
+    ],
+    "required_facts": [
+      "$1,925"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "technology_new",
+    "question": "What is the graduate technology fee in 2026-2027?",
+    "expected_sources": [
+      "08_Tuition_Fees_2026_2027.docx"
+    ],
+    "required_facts": [
+      "$190"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "fees_old",
+    "question": "What is the graduate student services fee in 2025-2026?",
+    "expected_sources": [
+      "07_Tuition_Fees_2025_2026.docx"
+    ],
+    "required_facts": [
+      "$120"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "tuition_compare",
+    "question": "Compare graduate tuition per credit in 2025-2026 and 2026-2027.",
+    "expected_sources": [
+      "07_Tuition_Fees_2025_2026.docx",
+      "08_Tuition_Fees_2026_2027.docx"
+    ],
+    "required_facts": [
+      "$1,850",
+      "$1,925"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "calendar_old",
+    "question": "When do Fall 2025 classes begin?",
+    "expected_sources": [
+      "09_Academic_Calendar_2025_2026.docx"
+    ],
+    "required_facts": [
+      "September 2, 2025"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "calendar_new",
+    "question": "When do Fall 2026 classes begin?",
+    "expected_sources": [
+      "10_Academic_Calendar_2026_2027.docx"
+    ],
+    "required_facts": [
+      "September 1, 2026"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "spring_new",
+    "question": "When do Spring 2027 classes begin?",
+    "expected_sources": [
+      "10_Academic_Calendar_2026_2027.docx"
+    ],
+    "required_facts": [
+      "January 19, 2027"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "cs_core",
+    "question": "Which sample core courses appear in the 2026 Computer Science handbook?",
+    "expected_sources": [
+      "03_CS_Program_Handbook_2026.docx"
+    ],
+    "required_facts": [
+      "CS 583 Deep Learning"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "ds_courses",
+    "question": "Which sample courses are listed for the Data Science program?",
+    "expected_sources": [
+      "04_DS_Program_Handbook_2026.docx"
+    ],
+    "required_facts": [
+      "DS 520 Data Management"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "cyber_courses",
+    "question": "Which sample courses are listed for Cybersecurity?",
+    "expected_sources": [
+      "05_Cybersecurity_Program_Handbook_2026.docx"
+    ],
+    "required_facts": [
+      "CY 520 Network Defense"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "cs_compare",
+    "question": "How do the 2025 and 2026 Computer Science sample core courses differ?",
+    "expected_sources": [
+      "15_CS_Program_Handbook_2025.docx",
+      "03_CS_Program_Handbook_2026.docx"
+    ],
+    "required_facts": [
+      "does not list CS 583",
+      "CS 583 Deep Learning"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "undergraduate",
+    "question": "What additional transcripts do transfer applicants submit?",
+    "expected_sources": [
+      "02_Undergraduate_Admissions_Requirements_2026.docx"
+    ],
+    "required_facts": [
+      "postsecondary transcripts"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "grad_apply",
+    "question": "What materials do graduate applicants submit under the 2026 requirements?",
+    "expected_sources": [
+      "01_Graduate_Admissions_Requirements_2026.docx"
+    ],
+    "required_facts": [
+      "statement of purpose"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "housing",
+    "question": "Does housing eligibility guarantee a housing assignment?",
+    "expected_sources": [
+      "13_Housing_Policy_2026.docx"
+    ],
+    "required_facts": [
+      "does not guarantee"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "dining",
+    "question": "What determines meal-plan options?",
+    "expected_sources": [
+      "14_Dining_Policy_2026.docx"
+    ],
+    "required_facts": [
+      "student category and housing arrangement"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "scholarship",
+    "question": "What are the graduate scholarship eligibility conditions?",
+    "expected_sources": [
+      "11_Scholarship_Policy_2026.docx"
+    ],
+    "required_facts": [
+      "full-time enrollment"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "assistantship",
+    "question": "What types of graduate assistantship roles are available?",
+    "expected_sources": [
+      "12_Assistantship_Policy_2026.docx"
+    ],
+    "required_facts": [
+      "teaching-assistant"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "faq",
+    "question": "Does scholarship eligibility automatically create an assistantship?",
+    "expected_sources": [
+      "17_Scholarship_Assistantship_FAQ_2026.docx"
+    ],
+    "required_facts": [
+      "separate programs"
+    ],
+    "expected_status": "answered",
+    "split": "development"
+  },
+  {
+    "id": "records",
+    "question": "For what purposes should student records be accessed and disclosed?",
+    "expected_sources": [
+      "18_Student_Record_Policy_2026.docx"
+    ],
+    "required_facts": [
+      "authorized educational or administrative purposes"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "registration",
+    "question": "Must course prerequisites be satisfied before registration?",
+    "expected_sources": [
+      "19_Registration_Add_Drop_2026.docx"
+    ],
+    "required_facts": [
+      "satisfied or formally approved"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "international",
+    "question": "What academic-planning topics does international student guidance cover?",
+    "expected_sources": [
+      "20_International_Student_Guidance_2026.docx"
+    ],
+    "required_facts": [
+      "enrollment planning"
+    ],
+    "expected_status": "answered",
+    "split": "test"
+  },
+  {
+    "id": "unknown_parking",
+    "question": "How much is the 2026 parking permit?",
+    "expected_sources": [],
+    "required_facts": [],
+    "expected_status": "unknown",
+    "split": "test"
+  },
+  {
+    "id": "unknown_deadline",
+    "question": "What is the exact scholarship application deadline?",
+    "expected_sources": [],
+    "required_facts": [],
+    "expected_status": "unknown",
+    "split": "test"
+  },
+  {
+    "id": "unknown_personal",
+    "question": "What is my current GPA?",
+    "expected_sources": [],
+    "required_facts": [],
+    "expected_status": "unknown",
+    "split": "test"
+  },
+  {
+    "id": "unknown_contract",
+    "question": "What is the exact housing cancellation penalty?",
+    "expected_sources": [],
+    "required_facts": [],
+    "expected_status": "unknown",
+    "split": "test"
+  },
+  {
+    "id": "ambiguous_calendar",
+    "question": "When do classes begin?",
+    "expected_sources": [],
+    "required_facts": [],
+    "expected_status": "clarify",
+    "split": "test"
+  },
+  {
+    "id": "ambiguous_tuition",
+    "question": "How much is graduate tuition per credit?",
+    "expected_sources": [],
+    "required_facts": [],
+    "expected_status": "clarify",
+    "split": "test"
+  }
+]

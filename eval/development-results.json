@@ -1,0 +1,317 @@
+{
+  "created_at": "2026-09-16T17:35:47.079554+00:00",
+  "split": "development",
+  "collection": "quackquery_synthetic_416046ea2d2f44a480dc1e4a02a2e9ee",
+  "corpus_hashes": {
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/01_Graduate_Admissions_Requirements_2026.docx": "50b234d48c658cb110015fb530b7b848598992ca3436260596996941d8894221",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/02_Undergraduate_Admissions_Requirements_2026.docx": "eaaa495ff081b3f75e3fec6f6a6634de365ad6c0997b4ecb93332da4cf5fa15a",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/03_CS_Program_Handbook_2026.docx": "a8a4f1ed199c1c21119d6b99bfea44d4ced7b29ba0fdf67606c6d40b87cb5514",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/04_DS_Program_Handbook_2026.docx": "074448a906ab78309a3aace19ec3f4fe71fb6cd9b1f084bc86fe457fd4f78671",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/05_Cybersecurity_Program_Handbook_2026.docx": "8ccff87e05e5964c067f9aa50a43c945d703fdec8587f378652eae9691015f46",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/06_Course_Catalog_2026_2027.docx": "66384060176c70dbc88150356617a787d57a5905797ea9d5ea93cebbd0cda48a",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/07_Tuition_Fees_2025_2026.docx": "eef1ec3d895a22b3c6fa167f1aa5c0d4b5014a24a246c5f8592aa776cad1e2ef",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/08_Tuition_Fees_2026_2027.docx": "fa266eb938d52323015d7b548283149d539c2092f1fc58111c7a3e49d9b60422",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/09_Academic_Calendar_2025_2026.docx": "9a53c84d70878f2fa1a2cd97f7a4ec5be576f688b75a6701709978ac9b33e457",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/10_Academic_Calendar_2026_2027.docx": "23733af2f7afb004209b434fe772c60e11ff064921befbcce54258638e325f89",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/11_Scholarship_Policy_2026.docx": "9635919983ac7560464377bed8a9e7a6c0a204fee39fc168e2d550d466619db7",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/12_Assistantship_Policy_2026.docx": "41ee502766524a5a1a3f3cf589247a79b7feca4ca83440500e59bf3460c99598",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/13_Housing_Policy_2026.docx": "47c10c083a40b87a64ae6e3db7f5d5ba4bfa789730cdcd2fd84fb53543512d0f",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/14_Dining_Policy_2026.docx": "200cfdb6b9f5f6a9323d65d68839e1688a61d059b5b31f7d0c855d17367b6871",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/15_CS_Program_Handbook_2025.docx": "c3a9698c417d399641053aa4fb15157d1bbb6bf447e50ac16471b3234a092af2",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/16_Graduate_Admissions_2025.docx": "8b037e805e426b980681fa87918eaee4109e4245f89e8b4bafb511eaaa2dbccd",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/17_Scholarship_Assistantship_FAQ_2026.docx": "f13ee99c83b4f25963d0855297f30a28ffd8831b251c34df261bf0c91c8a3868",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/18_Student_Record_Policy_2026.docx": "355145f24e0f172ff001266ef6359136574e6354bf0116d45558c868d7bf9ec8",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/19_Registration_Add_Drop_2026.docx": "4235706fb030760d6fe1599c4d58ee23be8210c824ed43b04aac165b8ccb1904",
+    "stevens_synthetic_knowledge_base/01_SYNTHETIC_TEST_DATA/20_International_Student_Guidance_2026.docx": "cd329962b60fe98c61fcd1d6a607ebd829a4877574a1dff40cc10c329a7d3807"
+  },
+  "answer_evaluation": false,
+  "case_count": 9,
+  "summary": {
+    "semantic": {
+      "source_recall_at_3": 0.8888888888888888,
+      "all_sources_at_3": 0.8888888888888888,
+      "reciprocal_rank": 0.7777777777777778,
+      "evidence_coverage_at_3": 0.8888888888888888,
+      "seconds": 0.029391211114772078
+    },
+    "hybrid": {
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": 1,
+      "reciprocal_rank": 0.8703703703703703,
+      "evidence_coverage_at_3": 1.0,
+      "seconds": 0.028361744444636214
+    }
+  },
+  "results": [
+    {
+      "id": "course_cs583",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "15_CS_Program_Handbook_2025.docx",
+        "03_CS_Program_Handbook_2026.docx",
+        "01_Graduate_Admissions_Requirements_2026.docx"
+      ],
+      "seconds": 0.031840400013606995,
+      "source_recall_at_3": 0.0,
+      "all_sources_at_3": false,
+      "reciprocal_rank": 0,
+      "evidence_coverage_at_3": 0.0
+    },
+    {
+      "id": "course_cs583",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "15_CS_Program_Handbook_2025.docx",
+        "03_CS_Program_Handbook_2026.docx",
+        "06_Course_Catalog_2026_2027.docx"
+      ],
+      "seconds": 0.02679919998627156,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 0.3333333333333333,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "course_cs559",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "06_Course_Catalog_2026_2027.docx",
+        "15_CS_Program_Handbook_2025.docx",
+        "03_CS_Program_Handbook_2026.docx"
+      ],
+      "seconds": 0.029552799998782575,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "course_cs559",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "06_Course_Catalog_2026_2027.docx",
+        "15_CS_Program_Handbook_2025.docx",
+        "03_CS_Program_Handbook_2026.docx"
+      ],
+      "seconds": 0.026595200004521757,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "tuition_old",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "07_Tuition_Fees_2025_2026.docx",
+        "08_Tuition_Fees_2026_2027.docx",
+        "09_Academic_Calendar_2025_2026.docx"
+      ],
+      "seconds": 0.028499400010332465,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "tuition_old",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "07_Tuition_Fees_2025_2026.docx",
+        "08_Tuition_Fees_2026_2027.docx",
+        "16_Graduate_Admissions_2025.docx"
+      ],
+      "seconds": 0.02650750000611879,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "technology_new",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "07_Tuition_Fees_2025_2026.docx",
+        "08_Tuition_Fees_2026_2027.docx",
+        "16_Graduate_Admissions_2025.docx"
+      ],
+      "seconds": 0.025678200006950647,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 0.5,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "technology_new",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "08_Tuition_Fees_2026_2027.docx",
+        "07_Tuition_Fees_2025_2026.docx",
+        "16_Graduate_Admissions_2025.docx"
+      ],
+      "seconds": 0.02700530001311563,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "calendar_old",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "09_Academic_Calendar_2025_2026.docx",
+        "10_Academic_Calendar_2026_2027.docx",
+        "16_Graduate_Admissions_2025.docx"
+      ],
+      "seconds": 0.023099399986676872,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "calendar_old",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "09_Academic_Calendar_2025_2026.docx",
+        "10_Academic_Calendar_2026_2027.docx",
+        "16_Graduate_Admissions_2025.docx"
+      ],
+      "seconds": 0.024045300000580028,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "cs_core",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "15_CS_Program_Handbook_2025.docx",
+        "03_CS_Program_Handbook_2026.docx",
+        "06_Course_Catalog_2026_2027.docx"
+      ],
+      "seconds": 0.02826910000294447,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 0.5,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "cs_core",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "15_CS_Program_Handbook_2025.docx",
+        "03_CS_Program_Handbook_2026.docx",
+        "05_Cybersecurity_Program_Handbook_2026.docx"
+      ],
+      "seconds": 0.02942160001839511,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 0.5,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "undergraduate",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "02_Undergraduate_Admissions_Requirements_2026.docx",
+        "16_Graduate_Admissions_2025.docx",
+        "01_Graduate_Admissions_Requirements_2026.docx"
+      ],
+      "seconds": 0.03303530000266619,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "undergraduate",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "02_Undergraduate_Admissions_Requirements_2026.docx",
+        "16_Graduate_Admissions_2025.docx",
+        "01_Graduate_Admissions_Requirements_2026.docx"
+      ],
+      "seconds": 0.03205929999239743,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "housing",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "13_Housing_Policy_2026.docx",
+        "17_Scholarship_Assistantship_FAQ_2026.docx",
+        "01_Graduate_Admissions_Requirements_2026.docx"
+      ],
+      "seconds": 0.03242160001536831,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "housing",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "13_Housing_Policy_2026.docx",
+        "17_Scholarship_Assistantship_FAQ_2026.docx",
+        "12_Assistantship_Policy_2026.docx"
+      ],
+      "seconds": 0.030374900001334026,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "faq",
+      "split": "development",
+      "mode": "semantic",
+      "retrieved": [
+        "17_Scholarship_Assistantship_FAQ_2026.docx",
+        "11_Scholarship_Policy_2026.docx",
+        "12_Assistantship_Policy_2026.docx"
+      ],
+      "seconds": 0.032124699995620176,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    },
+    {
+      "id": "faq",
+      "split": "development",
+      "mode": "hybrid",
+      "retrieved": [
+        "17_Scholarship_Assistantship_FAQ_2026.docx",
+        "11_Scholarship_Policy_2026.docx",
+        "12_Assistantship_Policy_2026.docx"
+      ],
+      "seconds": 0.0324473999789916,
+      "source_recall_at_3": 1.0,
+      "all_sources_at_3": true,
+      "reciprocal_rank": 1.0,
+      "evidence_coverage_at_3": 1.0
+    }
+  ]
+}
