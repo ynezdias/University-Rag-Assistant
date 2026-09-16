@@ -1,0 +1,30 @@
+name: QuackQuery checks
+on: [push, pull_request]
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: pip check
+      - run: python -m unittest discover -s tests -v
+      - run: python -m compileall -q src app.py
+      - run: python -m src.ingest --dry-run
+  container:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t quackquery:test .
+      - name: Check health without provider credentials
+        run: |
+          docker run -d --name quackquery -p 8501:8501 quackquery:test
+          for attempt in $(seq 1 60); do
+            if curl --fail http://localhost:8501/_stcore/health; then exit 0; fi
+            sleep 5
+          done
+          docker logs quackquery
+          exit 1

@@ -1,0 +1,14 @@
+services:
+  quackquery:
+    build: .
+    ports:
+      - "127.0.0.1:8501:8501"
+    env_file: .env
+    environment:
+      QUACKQUERY_CORPUS: synthetic
+    volumes:
+      - quackquery_index:/app/chroma_db
+    restart: unless-stopped
+    mem_limit: 3g
+volumes:
+  quackquery_index:

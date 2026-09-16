@@ -1,0 +1,13 @@
+.git
+.venv
+venv
+.env
+.env.*
+!.env.example
+.cache
+chroma_db
+__pycache__
+**/__pycache__
+tests
+eval
+docs

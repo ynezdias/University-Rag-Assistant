@@ -1,7 +1,9 @@
 import logging
 from html import escape
 import streamlit as st
-from src.rag import ask_university_bot
+from src.rag import ask
+from src.knowledge import DATA_DIR
+import time
 
 st.set_page_config(
     page_title="QuackQuery",
@@ -202,164 +204,68 @@ summary { color: #6b7fa3 !important; font-size: 0.8rem !important; padding: 0.7r
 
 # ── Answer renderer ────────────────────────────────────────────────────────────
 
-def render_answer(text: str):
-    lines = escape(text).strip().split("\n")
-    preferred_lines, conflict_lines, body_lines = [], [], []
-    mode = "body"
-
-    for line in lines:
-        stripped = line.strip()
-        if stripped.startswith("✓"):
-            mode = "preferred"
-        elif stripped.startswith("⚠"):
-            mode = "conflict"
-        elif stripped == "" and mode in ("preferred", "conflict"):
-            if mode == "preferred":
-                preferred_lines.append(line)
-            else:
-                conflict_lines.append(line)
-            continue
-
-        if mode == "preferred":
-            preferred_lines.append(line)
-        elif mode == "conflict":
-            conflict_lines.append(line)
-        else:
-            body_lines.append(line)
-
-    if preferred_lines:
-        content = "\n".join(preferred_lines).strip()
-        st.markdown(f"""
-        <div style="background:linear-gradient(135deg,rgba(40,160,90,0.10),rgba(20,120,60,0.06));
-                    border:1px solid rgba(40,160,90,0.35);border-left:3px solid #28a05a;
-                    border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;
-                    font-size:0.9rem;color:#7ddba0;line-height:1.75;">
-            <strong style="color:#4cc87a;font-size:0.72rem;letter-spacing:0.08em;
-                           text-transform:uppercase;display:block;margin-bottom:0.4rem;">
-                ✓ Preferred Answer (most recent source)
-            </strong>{content}</div>""", unsafe_allow_html=True)
-
-    if conflict_lines:
-        content = "\n".join(conflict_lines).strip()
-        st.markdown(f"""
-        <div style="background:linear-gradient(135deg,rgba(220,80,50,0.10),rgba(180,50,30,0.06));
-                    border:1px solid rgba(220,80,50,0.35);border-left:3px solid #dc5032;
-                    border-radius:10px;padding:1rem 1.2rem;margin-bottom:1rem;
-                    font-size:0.88rem;color:#f0a090;line-height:1.75;">
-            <strong style="color:#e8705a;font-size:0.72rem;letter-spacing:0.08em;
-                           text-transform:uppercase;display:block;margin-bottom:0.4rem;">
-                ⚠ Conflict Detected
-            </strong>{content}</div>""", unsafe_allow_html=True)
-
-    body = "\n".join(body_lines).strip()
-    if body:
-        st.markdown(f'<div class="answer-card">{body}</div>', unsafe_allow_html=True)
-
-    if not preferred_lines and not conflict_lines and not body:
-        st.markdown('<div class="answer-card">I don\'t know based on the university documents.</div>', unsafe_allow_html=True)
-
-
-# ── Header ─────────────────────────────────────────────────────────────────────
-st.markdown("""
-<div class="rag-header">
-  <div class="header-crest">🎓</div>
-  <div class="header-text">
-    <h1>QuackQuery</h1>
-    <p>Stevens Institute of Technology · Document Intelligence</p>
-  </div>
-  <div class="header-badge">AI-Powered</div>
-</div>
-""", unsafe_allow_html=True)
-
-
-# ── Query bar ──────────────────────────────────────────────────────────────────
-st.markdown('<div class="query-panel">', unsafe_allow_html=True)
-st.markdown('<div class="query-label">Ask a question about Stevens documents</div>', unsafe_allow_html=True)
+st.title("QuackQuery")
+st.caption("University document intelligence with inspectable evidence")
 
 with st.sidebar:
     corpus = st.selectbox("Knowledge base", ["synthetic", "unverified"],
-                          format_func=lambda x: {"synthetic": "Synthetic demo", "unverified": "Original documents (unverified)"}[x])
-    st.info("Synthetic demo documents are fictional test data, not official university guidance." if corpus == "synthetic"
-            else "The original documents have not been verified against official university sources.")
+        format_func=lambda x: {"synthetic": "Synthetic demo", "unverified": "Original documents (unverified)"}[x])
+    st.info("Fictional test documents, not official university guidance." if corpus == "synthetic"
+            else "These documents have not been verified against official university sources.")
+    st.caption("Conversations stay in this browser session. Each knowledge base has its own history.")
+    if st.button("Clear conversation"):
+        st.session_state.setdefault("conversations", {})[corpus] = []
+    st.caption("Citations are checked for valid sources and matching quotations. This does not guarantee that every claim is correct.")
 
-col_input, col_btn = st.columns([5, 1])
-with col_input:
-    question = st.text_input(
-        label="question",
-        label_visibility="collapsed",
-        placeholder="e.g. What is the graduate fall priority deadline?",
-        key="question_input",
-    )
-with col_btn:
-    ask = st.button("Ask →", use_container_width=True)
-
-st.markdown('</div>', unsafe_allow_html=True)
+conversations = st.session_state.setdefault("conversations", {})
+messages = conversations.setdefault(corpus, [])
 
 
-# ── Results ────────────────────────────────────────────────────────────────────
-col_ans, col_src = st.columns([1, 1])
+def render_result(result, turn):
+    response = result["response"]
+    if response["status"] == "answered":
+        for number, claim in enumerate(response["claims"], 1):
+            st.markdown(claim["text"])
+            for evidence_number, evidence in enumerate(claim["evidence"], 1):
+                source = result["chunks"][evidence["source_id"] - 1]
+                meta = source["metadata"]
+                with st.expander(f"Source {evidence['source_id']}: {meta['filename']} - {meta.get('locator', 'Document')}"):
+                    st.text(evidence["quote"])
+                    st.caption(f"Type: {meta.get('source_type', 'unverified')} | Published: {meta.get('publication_date', 'unknown')}")
+                    st.text(source["text"])
+                    path = (DATA_DIR / meta.get("document_id", "")).resolve()
+                    if path.is_relative_to(DATA_DIR.resolve()) and path.is_file() and path.suffix.lower() in (".pdf", ".docx"):
+                        st.download_button("Download source", path.read_bytes(), file_name=path.name,
+                            key=f"download_{corpus}_{turn}_{number}_{evidence_number}")
+    else:
+        st.write(response["message"])
+    st.caption(f"Response time: {result['seconds']:.1f}s")
 
-if ask and question.strip():
-    with st.spinner("Searching documents..."):
-        try:
-            answer, chunks = ask_university_bot(question.strip(), corpus=corpus)
-        except Exception:
-            logging.exception("QuackQuery request failed")
-            st.error("The knowledge base or answer service is unavailable. Check ingestion and server configuration.")
-            st.stop()
 
-    with col_ans:
-        st.markdown('<div class="panel-label">Answer</div>', unsafe_allow_html=True)
-        render_answer(answer)
+for index, message in enumerate(messages):
+    with st.chat_message(message["role"]):
+        if message["role"] == "user":
+            st.write(message["content"])
+        else:
+            render_result(message["result"], index)
 
-    with col_src:
-        st.markdown('<div class="panel-label">Sources</div>', unsafe_allow_html=True)
-        for i, chunk in enumerate(chunks, 1):
-            meta  = chunk["metadata"]
-            fname = escape(meta.get("filename", "unknown"))
-            page  = escape(meta.get("locator", "unknown"))
-            chunk_num = meta.get("chunk_number", "?")
-            st.markdown(f"""
-            <div class="source-chip">
-              <div class="source-chip-num">{i}</div>
-              <div>
-                <div class="source-chip-file">{fname}</div>
-                <div class="source-chip-page">{page} · Chunk {chunk_num}</div>
-              </div>
-            </div>""", unsafe_allow_html=True)
-
-        with st.expander(f"View {len(chunks)} retrieved chunks"):
-            for i, chunk in enumerate(chunks, 1):
-                meta = chunk["metadata"]
-                st.markdown(
-                    f'<div class="chunk-card">'
-                    f'<span style="color:#c89b3c;font-weight:600">Chunk {i}</span>'
-                    f' · {escape(meta.get("filename","?"))} '
-                    f'{escape(meta.get("locator","unknown"))} '
-                    f'c.{meta.get("chunk_number","?")}<br><br>'
-                    f'{escape(chunk["text"])}'
-                    f'</div>',
-                    unsafe_allow_html=True
-                )
-
-else:
-    with col_ans:
-        st.markdown('<div class="panel-label">Answer</div>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="placeholder">
-          <div class="placeholder-icon">◈</div>
-          <div class="placeholder-text">
-            Type a question about admissions, tuition, deadlines,
-            courses, or international student policies.
-          </div>
-        </div>""", unsafe_allow_html=True)
-
-    with col_src:
-        st.markdown('<div class="panel-label">Sources</div>', unsafe_allow_html=True)
-        st.markdown("""
-        <div class="placeholder">
-          <div class="placeholder-icon">◇</div>
-          <div class="placeholder-text">
-            Retrieved document chunks will appear here after you ask a question.
-          </div>
-        </div>""", unsafe_allow_html=True)
+question = st.chat_input("Ask about requirements, courses, or a specific academic year", max_chars=1000)
+if question:
+    now = time.monotonic()
+    recent = [timestamp for timestamp in st.session_state.get("requests", []) if now - timestamp < 60]
+    if len(recent) >= 6:
+        st.warning("Please wait a moment. This demo allows six questions per minute per session.")
+    else:
+        st.session_state["requests"] = recent + [now]
+        history = [{"role": m["role"], "content": m["content"]} for m in messages[-6:]]
+        with st.spinner("Finding evidence..."):
+            try:
+                result = ask(question, corpus=corpus, history=history)
+            except Exception:
+                logging.exception("QuackQuery request failed")
+                st.error("The answer service is unavailable. Please try again shortly.")
+            else:
+                messages.extend([{"role": "user", "content": question},
+                                 {"role": "assistant", "content": result["answer"], "result": result}])
+                conversations[corpus] = messages[-20:]
+                st.rerun()
