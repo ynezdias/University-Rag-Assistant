@@ -1,8 +1,10 @@
+import logging
+from html import escape
 import streamlit as st
 from src.rag import ask_university_bot
 
 st.set_page_config(
-    page_title="Stevens RAG Assistant",
+    page_title="QuackQuery",
     page_icon="🎓",
     layout="wide",
 )
@@ -201,7 +203,7 @@ summary { color: #6b7fa3 !important; font-size: 0.8rem !important; padding: 0.7r
 # ── Answer renderer ────────────────────────────────────────────────────────────
 
 def render_answer(text: str):
-    lines = text.strip().split("\n")
+    lines = escape(text).strip().split("\n")
     preferred_lines, conflict_lines, body_lines = [], [], []
     mode = "body"
 
@@ -262,7 +264,7 @@ st.markdown("""
 <div class="rag-header">
   <div class="header-crest">🎓</div>
   <div class="header-text">
-    <h1>University RAG Assistant</h1>
+    <h1>QuackQuery</h1>
     <p>Stevens Institute of Technology · Document Intelligence</p>
   </div>
   <div class="header-badge">AI-Powered</div>
@@ -273,6 +275,12 @@ st.markdown("""
 # ── Query bar ──────────────────────────────────────────────────────────────────
 st.markdown('<div class="query-panel">', unsafe_allow_html=True)
 st.markdown('<div class="query-label">Ask a question about Stevens documents</div>', unsafe_allow_html=True)
+
+with st.sidebar:
+    corpus = st.selectbox("Knowledge base", ["synthetic", "unverified"],
+                          format_func=lambda x: {"synthetic": "Synthetic demo", "unverified": "Original documents (unverified)"}[x])
+    st.info("Synthetic demo documents are fictional test data, not official university guidance." if corpus == "synthetic"
+            else "The original documents have not been verified against official university sources.")
 
 col_input, col_btn = st.columns([5, 1])
 with col_input:
@@ -293,7 +301,12 @@ col_ans, col_src = st.columns([1, 1])
 
 if ask and question.strip():
     with st.spinner("Searching documents..."):
-        answer, chunks = ask_university_bot(question.strip())
+        try:
+            answer, chunks = ask_university_bot(question.strip(), corpus=corpus)
+        except Exception:
+            logging.exception("QuackQuery request failed")
+            st.error("The knowledge base or answer service is unavailable. Check ingestion and server configuration.")
+            st.stop()
 
     with col_ans:
         st.markdown('<div class="panel-label">Answer</div>', unsafe_allow_html=True)
@@ -303,15 +316,15 @@ if ask and question.strip():
         st.markdown('<div class="panel-label">Sources</div>', unsafe_allow_html=True)
         for i, chunk in enumerate(chunks, 1):
             meta  = chunk["metadata"]
-            fname = meta.get("filename", "unknown")
-            page  = meta.get("page_number", "?")
+            fname = escape(meta.get("filename", "unknown"))
+            page  = escape(meta.get("locator", "unknown"))
             chunk_num = meta.get("chunk_number", "?")
             st.markdown(f"""
             <div class="source-chip">
               <div class="source-chip-num">{i}</div>
               <div>
                 <div class="source-chip-file">{fname}</div>
-                <div class="source-chip-page">Page {page} · Chunk {chunk_num}</div>
+                <div class="source-chip-page">{page} · Chunk {chunk_num}</div>
               </div>
             </div>""", unsafe_allow_html=True)
 
@@ -321,10 +334,10 @@ if ask and question.strip():
                 st.markdown(
                     f'<div class="chunk-card">'
                     f'<span style="color:#c89b3c;font-weight:600">Chunk {i}</span>'
-                    f' · {meta.get("filename","?")} '
-                    f'p.{meta.get("page_number","?")} '
+                    f' · {escape(meta.get("filename","?"))} '
+                    f'{escape(meta.get("locator","unknown"))} '
                     f'c.{meta.get("chunk_number","?")}<br><br>'
-                    f'{chunk["text"]}'
+                    f'{escape(chunk["text"])}'
                     f'</div>',
                     unsafe_allow_html=True
                 )
